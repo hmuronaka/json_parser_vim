@@ -33,13 +33,12 @@ function! s:json_tokenizer.next_token() dict abort
   elseif self.input.match('(true|false)')
     let self.token = self.input.matched_string
     let self.token_type = 'BOOL'
-  elseif self.input.match('[[\]"\'{}:,]')
+  elseif self.input.match('[\]{}:,"'']')
     let self.token = self.input.matched_string
     let self.token_type = self.token
   else
     let self.token = ''
     let self.token_type = 'EOF'
   endif
-
   return self.token_type
 endfunction
