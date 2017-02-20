@@ -11,6 +11,12 @@ function! json_tokenizer#test()
   echom tokenizer.next_token() . ', ' . tokenizer.token
   echom tokenizer.next_token() . ', ' . tokenizer.token
   echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
+  echom tokenizer.next_token() . ', ' . tokenizer.token
 
 endfunction
 
@@ -24,16 +30,16 @@ function! json_tokenizer#create(text_stream)
 endfunction
 
 function! s:json_tokenizer.next_token() dict abort
-  if self.input.match('-\?\d\+(\.\d\+)\?([eE]\d+)?')
+  if self.input.match('-\?\d\+\(\.\d\+\)\?\([eE]\d\+\)\?')
     let self.token = self.input.matched_string
     let self.token_type = 'NUMBER'
-  elseif self.input.match('"(\"|[^"])*"')
+  elseif self.input.match('"\(\\"\|[^"]\)*"')
     let self.token = self.input.matched_string
     let self.token_type = 'STRING'
-  elseif self.input.match('(true|false)')
+  elseif self.input.match('\(true\|false\)')
     let self.token = self.input.matched_string
     let self.token_type = 'BOOL'
-  elseif self.input.match('[\]{}:,"'']')
+  elseif self.input.match('[\]{}:,]')
     let self.token = self.input.matched_string
     let self.token_type = self.token
   else
