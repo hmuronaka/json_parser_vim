@@ -2,7 +2,7 @@
 function! json_parser#test()
   let parser = json_parser#create('test.json')
   let json = parser.deserialize()
-  echom 'json: ' . json['TEST']
+"  echom 'json: ' . json.TEST
 endfunction
 
 let s:json_parser = {}
@@ -18,55 +18,58 @@ function! json_parser#create(file)
 endfunction
 
 function! s:json_parser.deserialize() dict abort
-  if self.tokenizer.next_token() != 'EOF'
+  if self.tokenizer.token_type != 'EOF'
     let self.value = self.deserialize_any()
   endif
   return self.value
 endfunction
 
 function! s:json_parser.deserialize_any() dict abort
+  echom 'json_parser.deserialize_any: ' . self.tokenizer.token_type
+  call self.tokenizer.next_token()
+
   if self.tokenizer.token_type == '{'
     return self.deserialize_map()
   elseif self.tokenizer.token_type == '['
     return self.deserialize_list()
   else
-    self.deserialize_value()
-  else
-    " parse error
+    return self.deserialize_value()
   endif
 endfunction
 
 function! s:json_parser.deserialize_map() dict abort
   let result = {}
-  while self.tokenizer.next_token() == ','
-    if self.tokenizer.token_type != 'STRING'
+  while 1
+    if self.tokenizer.next_token() != 'STRING'
       " parse error
     endif
-
     let key = self.tokenizer.token
-    let value = json_parser.deserialize_any()
+
+    if self.tokenizer.next_token() != ':'
+      "parse error
+    endif
+
+    let value = self.deserialize_any()
+    echom 'json_parser.deserialize_map: key:' . key . ', value:' . value
     let result[key] = value
+
+    if self.tokenizer.next_token() == '}'
+      break
+    elseif self.tokenizer.token_type != ','
+      "parse error
+    endif
   endwhile
-
-  if self.tokenizer.token != '}'
-    " parse error
-  endif
-
   return result
 endfunction
 
 function! s:json_parser.deserialize_list() dict abort
   let result = []
 
-  while self.tokenizer.next_token() == ','
+  while self.tokenizer.next_token() != ']'
     let value = self.deserialize_any()
+    echom 'json_parser.deserialize_list: value:' . value
     call add(result, value)
   endwhile
-
-  if self.tokenizer.token != ']'
-    " parser error
-  endif
-
   return result
 endfunction
 
