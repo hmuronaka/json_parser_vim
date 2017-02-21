@@ -2,7 +2,6 @@
 function! json_parser#test()
   let parser = json_parser#create('test.json')
   let json = parser.deserialize()
-"  echom 'json: ' . json.TEST
 endfunction
 
 let s:json_parser = {}
@@ -25,7 +24,6 @@ function! s:json_parser.deserialize() dict abort
 endfunction
 
 function! s:json_parser.deserialize_any() dict abort
-  echom 'json_parser.deserialize_any: ' . self.tokenizer.token_type
   call self.tokenizer.next_token()
 
   if self.tokenizer.token_type == '{'
@@ -41,22 +39,22 @@ function! s:json_parser.deserialize_map() dict abort
   let result = {}
   while 1
     if self.tokenizer.next_token() != 'STRING'
-      " parse error
+      throw 'json_parser.deserialize_map invalid token type: ' . self.tokenizer.token_type
+      echom 'parse error'
     endif
     let key = self.tokenizer.token
 
     if self.tokenizer.next_token() != ':'
-      "parse error
+      throw 'json_parser.deserialize_map invalid token type: ' . self.tokenizer.token_type
     endif
 
     let value = self.deserialize_any()
-    echom 'json_parser.deserialize_map: key:' . key . ', value:' . value
     let result[key] = value
 
     if self.tokenizer.next_token() == '}'
       break
     elseif self.tokenizer.token_type != ','
-      "parse error
+      throw 'json_parser.deserialize_map invalid token type: ' . self.tokenizer.token_type
     endif
   endwhile
   return result
@@ -65,22 +63,29 @@ endfunction
 function! s:json_parser.deserialize_list() dict abort
   let result = []
 
-  while self.tokenizer.next_token() != ']'
+  while 1
     let value = self.deserialize_any()
-    echom 'json_parser.deserialize_list: value:' . value
     call add(result, value)
+
+    if self.tokenizer.next_token() == ']'
+      break
+    elseif self.tokenizer.token_type != ','
+      throw 'json_parser.deserialize_list invalid token type: ' . self.tokenizer.token_type
+    endif 
   endwhile
   return result
 endfunction
 
 function! s:json_parser.deserialize_value()
+  let result = ''
   if self.tokenizer.token_type == 'STRING'
-    return self.tokenizer.token
+    let result =  self.tokenizer.token
   elseif self.tokenizer.token_type == 'NUMBER'
-    return str2nr(self.tokenizer.token)
+    let result = str2nr(self.tokenizer.token)
   elseif self.tokenizer.token_type == 'BOOL'
-    return self.tokenizer.token =~ 'true\c' ? 1 : 0
+    let result = (self.tokenizer.token =~ 'true\c' ? 1 : 0)
   else
-    " parser error
+    throw 'json_parser.deserialize_value invalid token type: ' . self.tokenizer.token_type
   endif 
+  return result
 endfunction

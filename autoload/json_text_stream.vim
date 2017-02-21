@@ -20,7 +20,7 @@ function! s:json_text_stream.match(pattern) dict abort
   endwhile
 
   if self.linenum < len(self.lines)
-    let match_result = matchstrpos(self.lines[self.linenum], '^\s*' . a:pattern, self.column)
+    let match_result = matchstrpos(self.lines[self.linenum], '^\s*\zs' . a:pattern . '\ze', self.column)
     if empty(match_result[0])
       return 0
     endif
