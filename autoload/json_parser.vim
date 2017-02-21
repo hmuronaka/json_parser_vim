@@ -1,39 +1,43 @@
 
+function! json_parser#test()
+  let parser = json_parser#create('test.json')
+  let json = parser.deserialize()
+  echom 'json: ' . json['TEST']
+endfunction
 
-let json_parser = {}
+let s:json_parser = {}
 function! json_parser#create(file)
-  let obj = copy(json_parser)
-  obj.file = file
+  let obj = copy(s:json_parser)
+  let obj.file = a:file
   
-  let text_stream = text_stream#create(file)
-  obj.tokenizer = json_tokenizer#create(text_stream)
-  obj.state = 'INIT'
-  obj.value = ''
+  let text_stream = json_text_stream#create(a:file)
+  let obj.tokenizer = json_tokenizer#create(text_stream)
+  let obj.state = 'INIT'
+  let obj.value = ''
   return obj
 endfunction
 
-function! json_parser.deserialize() dict abort
+function! s:json_parser.deserialize() dict abort
   if self.tokenizer.next_token() != 'EOF'
-    obj.value = json_parser.deserialize_any()
+    let self.value = self.deserialize_any()
   endif
+  return self.value
 endfunction
 
 function! s:json_parser.deserialize_any() dict abort
   if self.tokenizer.token_type == '{'
-    return json_parser.deserialize_map()
+    return self.deserialize_map()
   elseif self.tokenizer.token_type == '['
-    return json_parser.deserialize_list()
+    return self.deserialize_list()
   else
-    json_parser.deserialize_value()
+    self.deserialize_value()
   else
     " parse error
   endif
 endfunction
 
-function! s:json_parser.deserialize_map(parent) dict abort
-  if empty(a:parent) 
-    let a:parent = {}
-  endif
+function! s:json_parser.deserialize_map() dict abort
+  let result = {}
   while self.tokenizer.next_token() == ','
     if self.tokenizer.token_type != 'STRING'
       " parse error
@@ -41,31 +45,29 @@ function! s:json_parser.deserialize_map(parent) dict abort
 
     let key = self.tokenizer.token
     let value = json_parser.deserialize_any()
-    let a:parent[key] = value
+    let result[key] = value
   endwhile
 
-  if self.tokenizer.token() != '}'
+  if self.tokenizer.token != '}'
     " parse error
   endif
 
-  return a:parent
+  return result
 endfunction
 
-function! s:json_parser.deserialize_list(parent) dict abort
-  if empty(a:parent)
-    let a:parent = []
-  endif
+function! s:json_parser.deserialize_list() dict abort
+  let result = []
 
   while self.tokenizer.next_token() == ','
-    let value = json_parser.deserialize_any()
-    call add(a:parent, value)
+    let value = self.deserialize_any()
+    call add(result, value)
   endwhile
 
-  if self.tokenizer.token() != ']'
+  if self.tokenizer.token != ']'
     " parser error
   endif
 
-  return a:parent
+  return result
 endfunction
 
 function! s:json_parser.deserialize_value()
