@@ -1,24 +1,24 @@
 
-function! json_tokenizer#test()
-  let stream = json_text_stream#create('test.json')
-  let tokenizer = json_tokenizer#create(stream)
-
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-  echom tokenizer.next_token() . ', ' . tokenizer.token
-
-endfunction
+" function! json_tokenizer#test()
+"   let stream = json_text_stream#create('test.json')
+"   let tokenizer = json_tokenizer#create(stream)
+"
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"   echom tokenizer.next_token() . ', ' . tokenizer.token
+"
+" endfunction
 
 let s:json_tokenizer = {}
 function! json_tokenizer#create(text_stream)
